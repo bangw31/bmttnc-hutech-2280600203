@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caesar Cipher - Bảo Mật Thông Tin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa; /* Light grey background */
+            color: #343a40; /* Dark grey text */
+        }
+        .header-section {
+            background-color: #002244; /* Dark blue for header */
+            padding: 30px 0;
+            color: white;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+        .header-section .logo {
+            max-width: 150px; /* Adjust logo size */
+            height: auto;
+            display: block;
+            margin: 0 auto 20px auto; /* Centered and spacing below */
+        }
+        .header-section h1 {
+            font-weight: 700; /* Bold for main title */
+            margin-bottom: 10px;
+        }
+        .content-section {
+            background-color: #ffffff; /* White background for content */
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 800px; /* Max width for content */
+            margin: auto; /* Center content block */
+        }
+        .content-section h2 {
+            font-weight: 600; /* Semi-bold for section title */
+            color: #003366; /* Slightly lighter blue */
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #003366;
+        }
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            padding: 10px 15px;
+        }
+        .btn-primary {
+            background-color: #0056b3;
+            border-color: #0056b3;
+            font-weight: 600;
+            padding: 10px 25px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #003366;
+            border-color: #003366;
+        }
+        .alert {
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+        .back-link {
+            display: block;
+            margin-top: 30px;
+            text-align: center;
+            font-weight: 600;
+            color: #0056b3;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .back-link:hover {
+            color: #003366;
+        }
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+            color: #6c757d; /* Muted grey for footer text */
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-section">
+        <img src="https://file1.hutech.edu.vn/file/editor/homepage/stories/hinh34/logo%20CMYK-01.png" alt="HUTECH Logo" class="logo">
+        <h1>THỰC HÀNH AN TOÀN THÔNG TIN NÂNG CAO</h1>
+    </div>
+
+    <div class="container content-section">
+        <h2>MÃ HÓA & GIẢI MÃ CAESAR CIPHER</h2>
+
+        <form id="caesarForm">
+            <div class="mb-3">
+                <label for="inputText" class="form-label">Văn bản đầu vào:</label>
+                <textarea class="form-control" id="inputText" name="inputText" rows="4" placeholder="Nhập văn bản cần mã hóa hoặc giải mã"></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="key" class="form-label">Khóa dịch chuyển (Shift Key):</label>
+                <input type="number" class="form-control" id="key" name="key" min="0" max="25" value="3">
+            </div>
+            <div class="mb-4">
+                <label for="operation" class="form-label">Chọn thao tác:</label>
+                <select class="form-select" id="operation">
+                    <option value="encrypt">Mã hóa</option>
+                    <option value="decrypt">Giải mã</option>
+                </select>
+            </div>
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">Thực hiện</button>
+            </div>
+        </form>
+
+        <div class="alert alert-info mt-4" role="alert" id="outputResult">
+            Kết quả sẽ hiển thị ở đây.
+        </div>
+
+        <a href="/" class="back-link">&larr; Quay lại trang chính</a>
+    </div>
+
+    <footer>
+        &copy; 2025 HUTECH. All rights reserved.
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        document.getElementById('caesarForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Ngăn chặn form gửi đi mặc định
+
+            const inputText = document.getElementById('inputText').value;
+            const key = parseInt(document.getElementById('key').value);
+            const operation = document.getElementById('operation').value;
+            const outputResult = document.getElementById('outputResult');
+
+            if (inputText.trim() === "") {
+                outputResult.className = "alert alert-warning mt-4";
+                outputResult.textContent = "Vui lòng nhập văn bản đầu vào.";
+                return;
+            }
+
+            if (isNaN(key) || key < 0 || key > 25) {
+                outputResult.className = "alert alert-warning mt-4";
+                outputResult.textContent = "Khóa dịch chuyển phải là một số từ 0 đến 25.";
+                return;
+            }
+
+            let endpoint = '';
+            let formData = new FormData(); // Sử dụng FormData để gửi dữ liệu form
+
+            if (operation === 'encrypt') {
+                endpoint = '/api/caesar/encrypt'; // Endpoint mã hóa
+                formData.append('inputText', inputText); // Tên trường khớp với request.form trong Flask
+                formData.append('key', key);
+            } else {
+                endpoint = '/api/caesar/decrypt'; // Endpoint giải mã
+                formData.append('inputText', inputText); // Tên trường khớp với request.form trong Flask
+                formData.append('key', key);
+            }
+
+            fetch(endpoint, {
+                method: 'POST',
+                body: formData // Gửi dữ liệu dưới dạng FormData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    // Xử lý lỗi HTTP
+                    return response.text().then(text => { throw new Error(text) });
+                }
+                return response.json(); // Phản hồi từ Flask là JSON
+            })
+            .then(data => {
+                outputResult.className = "alert alert-success mt-4";
+                if (operation === 'encrypt') {
+                    // Đảm bảo tên trường trong data khớp với JSON bạn trả về từ Flask
+                    outputResult.textContent = `Kết quả mã hóa: ${data.encrypted_text}`;
+                } else {
+                    outputResult.textContent = `Kết quả giải mã: ${data.decrypted_text}`;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                outputResult.className = "alert alert-danger mt-4";
+                outputResult.textContent = `Đã xảy ra lỗi: ${error.message || error}. Vui lòng kiểm tra lại server và đầu vào.`;
+            });
+        });
+    </script>
+</body>
+</html>

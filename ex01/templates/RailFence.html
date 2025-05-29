@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rail Fence Cipher - Bảo Mật Thông Tin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+        .header-section {
+            background-color: #002244;
+            padding: 30px 0;
+            color: white;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+        .header-section .logo {
+            max-width: 150px;
+            height: auto;
+            display: block;
+            margin: 0 auto 20px auto;
+        }
+        .header-section h1 {
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .content-section {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: auto;
+        }
+        .content-section h2 {
+            font-weight: 600;
+            color: #003366;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #003366;
+        }
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            padding: 10px 15px;
+        }
+        .btn-primary {
+            background-color: #0056b3;
+            border-color: #0056b3;
+            font-weight: 600;
+            padding: 10px 25px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #003366;
+            border-color: #003366;
+        }
+        .alert {
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+        .back-link {
+            display: block;
+            margin-top: 30px;
+            text-align: center;
+            font-weight: 600;
+            color: #0056b3;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .back-link:hover {
+            color: #003366;
+        }
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-section">
+        <img src="https://file1.hutech.edu.vn/file/editor/homepage/stories/hinh34/logo%20CMYK-01.png" alt="HUTECH Logo" class="logo">
+        <h1>THỰC HÀNH AN TOÀN THÔNG TIN NÂNG CAO</h1>
+    </div>
+
+    <div class="container content-section">
+        <h2>MÃ HÓA & GIẢI MÃ RAIL FENCE CIPHER</h2>
+
+        <form id="cipherForm">
+            <div class="mb-3">
+                <label for="inputText" class="form-label">Văn bản đầu vào:</label>
+                <textarea class="form-control" id="inputText" name="inputText" rows="4" placeholder="Nhập văn bản cần mã hóa hoặc giải mã"></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="key" class="form-label">Khóa (Số hàng rào - Key):</label>
+                <input type="number" class="form-control" id="key" name="key" min="2" value="2">
+            </div>
+            <div class="mb-4">
+                <label for="operation" class="form-label">Chọn thao tác:</label>
+                <select class="form-select" id="operation">
+                    <option value="encrypt">Mã hóa</option>
+                    <option value="decrypt">Giải mã</option>
+                </select>
+            </div>
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">Thực hiện</button>
+            </div>
+        </form>
+
+        <div class="alert alert-info mt-4" role="alert" id="outputResult">
+            Kết quả sẽ hiển thị ở đây.
+        </div>
+
+        <a href="/" class="back-link">&larr; Quay lại trang chính</a>
+    </div>
+
+    <footer>
+        &copy; 2025 HUTECH. All rights reserved.
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        document.getElementById('cipherForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const inputText = document.getElementById('inputText').value;
+            const key = parseInt(document.getElementById('key').value); // Parse key to integer
+            const operation = document.getElementById('operation').value;
+            const outputResult = document.getElementById('outputResult');
+
+            if (inputText.trim() === "") {
+                outputResult.className = "alert alert-warning mt-4";
+                outputResult.textContent = "Vui lòng nhập văn bản đầu vào.";
+                return;
+            }
+
+            if (isNaN(key) || key < 2) { // Rail Fence needs at least 2 rails
+                outputResult.className = "alert alert-warning mt-4";
+                outputResult.textContent = "Khóa (số hàng rào) phải là một số nguyên lớn hơn hoặc bằng 2.";
+                return;
+            }
+
+            let endpoint = '';
+            let requestBody = {};
+
+            if (operation === 'encrypt') {
+                endpoint = '/api/railfence/encrypt';
+                requestBody = { plain_text: inputText, key: key };
+            } else {
+                endpoint = '/api/railfence/decrypt';
+                requestBody = { cipher_text: inputText, key: key };
+            }
+
+            fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => { throw new Error(text) });
+                }
+                return response.json();
+            })
+            .then(data => {
+                outputResult.className = "alert alert-success mt-4";
+                // API của Rail Fence trả về 'encrypted_text' hoặc 'decrypted_text'
+                if (operation === 'encrypt') {
+                    outputResult.textContent = `Kết quả mã hóa: ${data.encrypted_text}`;
+                } else {
+                    outputResult.textContent = `Kết quả giải mã: ${data.decrypted_text}`;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                outputResult.className = "alert alert-danger mt-4";
+                outputResult.textContent = `Đã xảy ra lỗi: ${error.message || error}. Vui lòng kiểm tra lại server và đầu vào.`;
+            });
+        });
+    </script>
+</body>
+</html>
